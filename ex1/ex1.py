@@ -6,18 +6,17 @@ import json
 
 def recipe_spider(max_pages):
     page = 1
-    page_counter = 2
+    page_counter = 1
     while page <= max_pages:
         # url = 'https://www.allrecipes.com/recipes/156/bread/'
         url = 'https://www.allrecipes.com/recipes/156/bread/?page=' + str(page_counter)
-        print(url)
         source_code = requests.get(url)
         plain_text = source_code.text
-        soup = BeautifulSoup(plain_text)
-        for link in soup.findAll('a', {'data-internal-referrer-link': 'hub recipe'}):
-            href = link.get('href')
-            if '/recipe' in href:
-                # href = "https://www.allrecipes.com" + link.get('href')
+        soup = BeautifulSoup(plain_text, 'html.parser')
+        for link in soup.findAll('div', {'class': 'fixed-recipe-card__info'}):
+            href = link.select_one('a').get('href')
+            print(href)
+            if href is not None:
                 get_single_item_data(href)
                 page += 1
                 if page > max_pages:
